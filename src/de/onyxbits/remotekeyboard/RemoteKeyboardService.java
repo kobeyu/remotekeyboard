@@ -13,6 +13,8 @@ import java.util.Properties;
 
 import net.wimpi.telnetd.BootException;
 import net.wimpi.telnetd.TelnetD;
+import net.wimpi.telnetd.net.ConnectionFilter;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -83,6 +85,17 @@ public class RemoteKeyboardService extends InputMethodService implements
 			telnetServer = TelnetD.getReference();
 			if (telnetServer == null) {
 				telnetServer = TelnetD.createTelnetD(props);
+                telnetServer.getPortListener("std").getConnectionManager().setConnectionFilter(new ConnectionFilter() {
+                    @Override
+                    public void initialize(Properties props) {
+
+                    }
+
+                    @Override
+                    public boolean isAllowed(InetAddress ip) {
+                        return ip.isLoopbackAddress();
+                    }
+                });
 			}
 			telnetServer.start();
 
